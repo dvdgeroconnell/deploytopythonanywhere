@@ -1,0 +1,212 @@
+<!-- Adding genre to the work in progress version -->
+
+<html>
+    <head>
+        <title>Records</title>
+        <!-- CSS only -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="./record_ajax2.js"></script>
+    </head>
+    <body>
+        <h1>Records Database</h1>
+        <div> <!-- Create button... (comment out the "Create button..." text so it doesn't display) -->
+            <!-- button <input type="submit" value="Create" id="name"/><br/> -->
+            <button id="button-showCreate" onclick="showCreate()" style="display:block">Create a record</button><br/>
+        </div>
+        <div>
+            <table class="table" id="recordTable" style="display:block">
+                <!-- 'style="display:block"' displays the table more condensed -->
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Year</th>
+                    <th>Genre</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+            </table>
+        </div>
+        <div id='createUpdateForm' style="display:none">
+            <h2>
+                <!-- both buttons in span tags as only one will be displayed-->
+                <!--"display:none" makes it hidden-->
+                <!--Create a Record or Update this Record is displayed-->
+                <span id="createLabel">Create a</span>
+                <span id="updateLabel" style="display:none">Update the</span> Record
+            </h2>
+            <!--
+            <div class="parent">
+                <pre>&nbsp;id     <input type="text" name="id"></pre>
+                <div class="child">
+                    <pre>&nbsp;Title  <input type="text" name="title"></pre>
+                    <pre>&nbsp;Artist <input type="text" name="artist"></pre>
+                </div>
+            -->
+            <pre>&nbsp;id     <input type="text" value="auto-assigned" name="id" disabled></pre>
+            <pre>&nbsp;Title  <input type="text" name="title"></pre>
+            <pre>&nbsp;Artist <input type="text" name="artist"></pre>
+            <pre>&nbsp;Year   <input type="number" name="year"></pre>
+            <!-- <pre>&nbsp;Genre  <input type="text" name="genre"></pre> -->
+            <pre>&nbsp;Genre  <select type="text" name="genre"></pre>
+                <option value="Rock">Rock</option>
+                <option value="Pop">Pop</option>
+                <option value="Punk">Punk</option>
+                <option value="Heavy Metal">Heavy Metal</option>
+                <option value="Disco">Disco</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Other">Other</option>
+            </select><br/>
+            <span><button id="button-doCreate" onclick="doCreate()">Create</button></span>
+            <span><button id="button-doUpdate" onclick="doUpdate()" style="display:none">Update</button></span>
+        </div>
+    </body>
+    
+    <script>
+
+        // build the table from the database
+        getAll(processGetAll)
+
+        function showCreate(){
+           // function to hide the create button and the table, and show the
+           // createUpdateForm <div>
+            document.getElementById('button-showCreate').style.display="none"
+            document.getElementById('recordTable').style.display="none"
+            document.getElementById('createUpdateForm').style.display="block"
+            document.getElementById('createLabel').style.display="inline"
+            document.getElementById('updateLabel').style.display="none"
+            document.getElementById('button-doCreate').style.display="block"
+            document.getElementById('button-doUpdate').style.display = "none"
+        }
+        function getRecordFromRow(rowElement){
+            // read the record from the table into a record object
+            var record = {}
+            record.id = rowElement.cells[0].firstChild.textContent
+            record.title = rowElement.cells[1].firstChild.textContent
+            record.artist = rowElement.cells[2].firstChild.textContent
+            record.year = rowElement.cells[3].firstChild.textContent
+            record.genre = rowElement.cells[4].firstChild.textContent
+            return record
+        }
+        function populateFormWithRecord(record){
+            var form = document.getElementById('createUpdateForm')
+            form.querySelector('input[name="id"]').disabled = true
+            form.querySelector('input[name="id"]').value = record.id
+            form.querySelector('input[name="title"]').value= record.title
+            form.querySelector('input[name="artist"]').value = record.artist
+            form.querySelector('input[name="year"]').value = record.year
+            form.querySelector('select[name="genre"]').value = record.genre
+        }
+        function showUpdate(buttonElement){
+            console.log("in showUpdate()...")
+            // show the form and Update button
+            document.getElementById("createUpdateForm").style.display = "block"
+            document.getElementById("button-doCreate").style.display = "none"
+            document.getElementById("button-doUpdate").style.display = "block"
+            document.getElementById("createLabel").style.display = "none"
+            document.getElementById("updateLabel").style.display = "inline"
+            // turn off the Create button and the table
+            document.getElementById("button-showCreate").style.display = "none"
+            document.getElementById("recordTable").style.display = "none"
+
+            // buttonElement function to show the form and the update button
+            // rowElement is the grandparent of the buttonElement that was passed in
+            // var rowElement = buttonElement.parentNode.parentNode
+            var rowElement = buttonElement.closest('tr')
+            record = getRecordFromRow(rowElement)
+            console.log("Updating "+ JSON.stringify(record))
+            populateFormWithRecord(record)
+            document.getElementById('createLabel').style.display="none"
+            document.getElementById('updateLabel').style.display="inline"
+        }
+        function showViewAll(){
+           // function to show the Create button and the table and hide the
+           // createUpdateForm <div> (the opposite of showCreate() above)
+            document.getElementById('button-showCreate').style.display="block"
+            document.getElementById('recordTable').style.display="block"
+            document.getElementById('createUpdateForm').style.display="none"
+        }
+        function getRecordFromForm(){
+            //record is the obect to be added to the database
+            var form = document.getElementById('createUpdateForm')
+            var record = {}
+            record.id = form.querySelector('input[name="id"]').value
+            record.title = form.querySelector('input[name="title"]').value
+            record.artist = form.querySelector('input[name="artist"]').value
+        	record.year = form.querySelector('input[name="year"]').value
+            record.genre = form.querySelector('select[name="genre"]').value
+            console.log("record to be added/updated is " + JSON.stringify(record))
+            return record
+        }
+        function addRecordToTable(record){
+            console.log("adding record to table " + JSON.stringify(record))
+            var tableElement = document.getElementById('recordTable')
+            var rowElement = tableElement.insertRow(-1)
+            // set the id as a row attribute so we can find it later when updating
+            rowElement.setAttribute('id', record.id)
+            // set attributes here
+            var cell1 = rowElement.insertCell(0);
+            cell1.innerHTML = record.id
+            var cell2 = rowElement.insertCell(1);
+            cell2.innerHTML = record.title
+            var cell3 = rowElement.insertCell(2);
+            cell3.innerHTML = record.artist
+            var cell4 = rowElement.insertCell(3);
+            cell4.innerHTML = record.year
+            var cell5 = rowElement.insertCell(4);
+            cell5.innerHTML = record.genre           
+            var cell6 = rowElement.insertCell(5);
+            cell6.innerHTML = '<button onclick="showUpdate(this)">update</button>'
+            var cell7 = rowElement.insertCell(6);
+            cell7.innerHTML = '<button onclick=doDelete(this)>delete</button>'
+        }
+        function setRecordInRow(rowElement, record){
+            rowElement.cells[0].firstChild.textContent= record.id
+            rowElement.cells[1].firstChild.textContent= record.title
+            rowElement.cells[2].firstChild.textContent= record.artist
+            rowElement.cells[3].firstChild.textContent= record.year
+            rowElement.cells[4].firstChild.textContent= record.genre
+        }
+        function clearForm(){
+            // clear the new form of the previous data
+            // we use querySelector to find the inputs instead of giving them ids
+            //console.log("in clearForm()...")
+            var form = document.getElementById('createUpdateForm')
+            form.querySelector('input[name="id"]').disabled = true
+            form.querySelector('input[name="id"]').value ='auto-assigned'
+            form.querySelector('input[name="artist"]').value=''
+            form.querySelector('input[name="title"]').value=''
+            form.querySelector('input[name="year"]').value=''
+            form.querySelector('select[name="genre"]').value='Rock'           
+        }
+        function doCreate(){
+            //console.log("Creating a record...")
+            record = getRecordFromForm()
+            // call the createRecord here - we'll need the id back before adding it to the table
+            createRecord(record, processCreateResponse)
+           //addRecordToTable(result)
+            showViewAll()
+            clearForm()
+        }
+        function doUpdate(){
+            //console.log("Updating a record...")
+            record = getRecordFromForm()
+            updateRecord(record, processUpdateResponse)
+            // get the row from the id and add to table
+            var rowElement = document.getElementById(record.id)
+            setRecordInRow(rowElement, record)
+            showViewAll()
+            clearForm()
+        }
+        function doDelete(buttonElement){
+            var tableElement = document.getElementById('recordTable')
+            var index = buttonElement.parentNode.parentNode.rowIndex;
+            var id = buttonElement.parentNode.parentNode.id;
+            //var index = buttonElement.closest('tr').rowIndex
+            console.log("Deleting record "+id)
+            deleteRecord(id, processDeleteResponse)
+            tableElement.deleteRow(index);
+        }
+    </script>
+</html>
