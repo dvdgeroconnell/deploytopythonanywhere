@@ -17,7 +17,6 @@ from mysql.connector import cursor
 from mysql.connector.errors import Error
 import sys
 
-#import mysqldbcfg_local as cfg
 import mysqldbcfg as cfg
 
 # Create the class
@@ -30,12 +29,32 @@ class RecordDAO:
     database =   ''
     
 #------------------------------------------------------------------------
+# Init with different config if running locally versus on pythonanywhere
 
     def __init__(self):
-        self.host     = cfg.mysqldb['host']
-        self.user     = cfg.mysqldb['user']
-        self.password = cfg.mysqldb['password']
-        self.database = cfg.mysqldb['database']
+
+        local_dao = False
+
+        if (len(sys.argv)) > 1:
+            local = sys.argv[1]
+            if local == "local":
+                local_dao = True
+                print("DAO Running local app server instance")
+
+        # For anything other than "local"...
+        if not local_dao:
+            print("DAO Running pythonanywhere app server instance")
+
+        if local_dao:
+            self.host     = cfg.local_db['host']
+            self.user     = cfg.local_db['user']
+            self.password = cfg.local_db['password']
+            self.database = cfg.local_db['database']
+        else:
+            self.host     = cfg.hosted_db['host']
+            self.user     = cfg.hosted_db['user']
+            self.password = cfg.hosted_db['password']
+            self.database = cfg.hosted_db['database']         
 
 #------------------------------------------------------------------------
 
@@ -55,14 +74,14 @@ class RecordDAO:
     def db_check(self):
         exists = False
         try:
-            print("Looking for",cfg.mysqldb['database'])
+            print("Looking for", self.database)
             # this will not return a cursor if the database doesn't exist and an exception will be thrown
             cursor = self.get_cursor()
             if cursor:
                 exists = True
         except Error as e:
             if e.errno == 1049:
-                print("Error: Database does not exist, creating database",cfg.mysqldb['database'])
+                print("Error: Database does not exist, creating database",self.database)
                 cnx = mc.connect(host=self.host,user=self.user,password=self.password)
                 cursor1 = cnx.cursor()
                 sql = "create database {}".format(self.database)
@@ -114,7 +133,8 @@ class RecordDAO:
 #------------------------------------------------------------------------
 
     # Get all records         
-    def get_all_records(self):    
+    def get_all_records(self):
+  
         cursor = self.get_cursor()
         sql_string="select * from {}".format(TABLE_NAME)
         cursor.execute(sql_string)
@@ -126,14 +146,15 @@ class RecordDAO:
         for result in results:
             #print(result)
             record_array.append(self.convert_to_dict(result))
-
         self.close_all()
+
         return record_array
 
 #------------------------------------------------------------------------
 # Find a record by ID
 
     def find_record_by_id(self, id):
+
         cursor = self.get_cursor()
         print("retrieving record id =", id)
         sql_string="select * from {} where id = %s".format(TABLE_NAME)
@@ -142,8 +163,8 @@ class RecordDAO:
         result = cursor.fetchone()
         returnvalue = self.convert_to_dict(result)
         self.close_all()
+
         return returnvalue
-        #return result
         
 #------------------------------------------------------------------------
 # Create a record
@@ -158,25 +179,28 @@ class RecordDAO:
         new_id = cursor.lastrowid
         record["id"] = new_id
         self.close_all()
+
         return record
 
 #------------------------------------------------------------------------
     # Update a record with an ID of 'id'
 
     def update_record(self, id, record):
+
         cursor = self.get_cursor()
         sql_string="update {} set title= %s,artist=%s, year=%s, genre=%s where id = %s".format(TABLE_NAME)
-        print(type(record))
         values = (record.get("title"), record.get("artist"), record.get("year"), record.get("genre"),id)
         cursor.execute(sql_string, values)
         self.connection.commit()
         self.close_all()
+
         return(record)
 
 #------------------------------------------------------------------------
 # Delete a record with an ID of 'id'  
 
     def delete_record(self, id):
+
         cursor = self.get_cursor()
         sql_string="delete from {} where id = %s".format(TABLE_NAME)
         values = (id,)
@@ -190,12 +214,14 @@ class RecordDAO:
 #------------------------------------------------------------------------
 
     def convert_to_dict(self, result_line):
+
         attkeys=['id','title','artist', "year", "genre"]
         record = {}
         currentkey=0
         for attrib in result_line:
             record[attkeys[currentkey]] = attrib
             currentkey+=1 
+
         return record
 
 #------------------------------------------------------------------------

@@ -1,13 +1,9 @@
-
-    //var local_url = "http://127.0.0.1:5000/records";
-    var local_url = "http://davidoconnell.pythonanywhere.com/records";
-
-    var andrew_url = "http://andrewbeatty1.pythonanywhere.com/books";
+    var local_url = "http://127.0.0.1:5000/records";
     var relative_url = "/records";
 
     function getAll(callback) {
         $.ajax({
-            "url": local_url,
+            "url": relative_url,
             "method":"GET",
             "data":"",
             "dataType": "JSON",
@@ -23,7 +19,7 @@
 
     function getOne(id, callback) {
         $.ajax({
-            "url": local_url+"/"+id,
+            "url": relative_url+"/"+id,
             "method":"GET",
             "data":"",
             "dataType": "JSON",
@@ -40,7 +36,7 @@
     function createRecord(record, callback){
         console.log("record to create: ",JSON.stringify(record));
         $.ajax({
-            "url": local_url,
+            "url": relative_url,
             "method":"POST",
             "data":JSON.stringify(record),
             "dataType":"JSON",
@@ -58,7 +54,7 @@
     function updateRecord(record, callback){
         console.log("record to update: ",JSON.stringify(record));
         $.ajax({
-            "url": local_url+"/"+encodeURI(record.id),
+            "url": relative_url+"/"+encodeURI(record.id),
             "method":"PUT",
             "data":JSON.stringify(record),
             "dataType":"JSON",
@@ -71,30 +67,12 @@
                 console.log("error: "+status+" msg:"+error);
             }
         });
-    }   
+    }
 
-    //            THIS VERSION TAKES IN AN ID SEPARATELY 
-    //            function updateRecord(record, id, callback){
-    //            //console.log(JSON.stringify(book));
-    //                $.ajax({
-    //                    "url": local_url+"/"+id,
-    //                    "method":"PUT",
-    //                    "data":JSON.stringify(record),
-    //                    "dataType":"JSON",
-    //                    contentType:"application/json; charset=utf-8",
-    //                    "success":function(result){
-    //                        console.log("Updated: ", result);
-    //                        callback(result);
-    //                    },
-    //                    "error":function(xhr,status,error){
-    //                        console.log("error: "+status+" msg:"+error);
-    //                    }
-    //                });
-    //            }   
 
     function deleteRecord(id, callback){
         $.ajax({
-            "url": local_url+"/"+id,
+            "url": relative_url+"/"+id,
             "method":"DELETE",
             "data":"",
             "dataType":"JSON",

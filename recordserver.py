@@ -1,21 +1,28 @@
-# record_rest_srv.py
+# record_server.py
 #
-# Create a basic rest server.
-# See README for curl commands to test.
+# Main python file and REST server for WSAA Final Project.
+# See README for instrunctions on use and curl commands to test.
 #
 # David O'Connell
 
 from flask import Flask, jsonify, url_for, request, redirect, abort, make_response
 from flask_cors import CORS, cross_origin
-#from recordDAOframework import recordDAO
 from recordDAO import recordDAO
+import sys
 
-# Had to enable CORS headers in flask (browser - no domain or running from file)
+# Had to enable CORS headers in flask. This site helped, as well as flask documentation.
 # https://stackoverflow.com/questions/25594893/how-to-enable-cors-in-flask
+# Probably not needed in PythonAnywhere based version, but they are working there.
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
-cors = CORS(app) # only needed if you want to expose all routes to cross origin
-app.config['CORS_HEADERS'] = 'Content-Type' # not sure if needed
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+# This is global, as declarred outside of any function
+local_env = False
+
+#------------------------------------------------------------------------
+# Build response to incoming OPTIONS request
 
 def _build_cors_preflight_response():
     response = make_response()
@@ -34,7 +41,7 @@ def index():
 
 #------------------------------------------------------------------------
 # Get all records
-# curl -X GET http://127.0.0.1:5000/records
+# Local: curl -X GET http://127.0.0.1:5000/records
 
 @app.route('/records', methods=["GET", "OPTIONS"])
 @cross_origin()
@@ -51,7 +58,7 @@ def get_all():
 
 #------------------------------------------------------------------------
 # Get record by ID
-# curl -X GET http://127.0.0.1:5000/records/2
+# Local: curl -X GET http://127.0.0.1:5000/records/2
 
 @app.route('/records/<int:id>', methods=["GET", "OPTIONS"])
 @cross_origin()
@@ -70,7 +77,7 @@ def find_by_id(id):
 # Create a record
 #curl -X POST -H "Content-Type: application/json" -d "{\"title\":\"Closer\", 
 # \"artist\":\"Joy Division\", \"year\":1981, \"genre\":\"post punk\"}" 
-# http://127.0.0.1:5000/records
+# Local: http://127.0.0.1:5000/records
 
 @app.route('/records', methods=["POST", "OPTIONS"])
 @cross_origin()
@@ -159,6 +166,17 @@ def delete(id):
         #response.headers.add("Access-Control-Allow-Origin", "*")
         return response
     
+#------------------------------------------------------------------------
+
+if (len(sys.argv)) > 1:
+    local = sys.argv[1]
+    if local == "local":
+        local_env = True
+        print("Running local app server instance")
+
+# For anything other than "local"...
+if not local_env:
+    print("Running PythonAnywhere app server instance")
 
 if __name__ == "__main__":
     app.run(debug=True)

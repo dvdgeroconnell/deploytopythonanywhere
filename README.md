@@ -16,6 +16,14 @@ This file.
 
 ## How to use
 
+### On PythonAnywere
+
+Access the URL: https://davidoconnell.pythonanywhere.com/recordviewerpa.html
+
+### In your local python environment
+
+
+
 If the credentials are not correct, the program will terminate and the user will be asked to fix them.
 If the database does not exist, it will be created.
 If the records table does not already exist in the database, will be created.
@@ -24,6 +32,8 @@ if the database is empty, it will be populated with a couple of records as examp
 create database wsaa_project;
 use wsaa_project
 create table records (id int AUTO_INCREMENT PRIMARY KEY, title varchar(250), artist varchar(250), year int, genre varchar(250));
+
+
 
 
 
