@@ -17,7 +17,7 @@ from mysql.connector import cursor
 from mysql.connector.errors import Error
 import sys
 
-import mysqldbcfg as cfg
+import PANDS.deploytopythonanywhere.mysqldbcfgol as cfg
 
 # Create the class
 class RecordDAO:

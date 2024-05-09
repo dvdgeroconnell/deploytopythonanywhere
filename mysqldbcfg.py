@@ -1,6 +1,6 @@
-mysqldb = {
-    'host':"localhost",
-    'user':"root",
-    'password':"",
-    'database':"wsaa_project"
+mysql = {
+    'host':"davidoconnell.mysql.pythonanywhere-services.com",
+    'user':"davidoconnell",
+    'password':"wsaa123!",
+    'database':"davidoconnell$wsaa"
 }

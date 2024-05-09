@@ -1,6 +1,5 @@
 
-    var local_url=""
-    //var local_url = "http://127.0.0.1:5000/records";
+    var local_url = "http://127.0.0.1:5000/records";
     var andrew_url = "http://andrewbeatty1.pythonanywhere.com/books";
     var relative_url = "/records";
 
