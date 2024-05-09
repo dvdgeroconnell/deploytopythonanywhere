@@ -1,4 +1,4 @@
-mysql = {
+mysqldb = {
     'host':"davidoconnell.mysql.pythonanywhere-services.com",
     'user':"davidoconnell",
     'password':"wsaa123!",
