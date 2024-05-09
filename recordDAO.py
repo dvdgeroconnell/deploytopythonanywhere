@@ -102,13 +102,13 @@ class RecordDAO:
 
     def table_check(self):
         exists = False
-        print("in table check")
+        #print("in table check")
         try:
             cursor = self.get_cursor()
             sql_string="show tables"
             cursor.execute(sql_string)
             dbtables = cursor.fetchall()
-            print("looking for",TABLE_NAME)
+            #print("looking for",TABLE_NAME)
             for dbtable in dbtables:
                 if dbtable[0] == TABLE_NAME:
                     exists = True
@@ -156,7 +156,7 @@ class RecordDAO:
     def find_record_by_id(self, id):
 
         cursor = self.get_cursor()
-        print("retrieving record id =", id)
+        #print("retrieving record id =", id)
         sql_string="select * from {} where id = %s".format(TABLE_NAME)
         values = (id,)
         cursor.execute(sql_string, values)
@@ -206,8 +206,8 @@ class RecordDAO:
         values = (id,)
         cursor.execute(sql_string, values)
         self.connection.commit()
+        #print("Deleted record", id)
         self.close_all()
-        print("Deleted record", id)
 
         return True
 
