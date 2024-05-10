@@ -1,147 +1,151 @@
-    var local_url = "http://127.0.0.1:5000/records";
-    var relative_url = "/records";
+// recordajax.js
 
-    function getAll(callback) {
-        $.ajax({
-            "url": relative_url,
-            "method":"GET",
-            "data":"",
-            "dataType": "JSON",
-            "success":function(result){
-                console.log("result is :", result);
-                callback(result);
-            },
-            "error":function(xhr,status,error){
-                console.log("error: "+status+" msg:"+error);
-            }
-        });
-    }
+//This is the javascript code with ajax calls to access the REST server methods
+// via HTTP.
+ 
+// David O'Connell
+//------------------------------------------------------------------------
+    
+var local_url = "http://127.0.0.1:5000/records";
+var relative_url = "/records";
 
-    function getOne(id, callback) {
-        $.ajax({
-            "url": relative_url+"/"+id,
-            "method":"GET",
-            "data":"",
-            "dataType": "JSON",
-            "success":function(result){
-                console.log("result is :", result);
-                callback(result);
-            },
-            "error":function(xhr,status,error){
-                console.log("error: "+status+" msg:"+error);
-            }
-        });
-    }
+//------------------------------------------------------------------------
+// Retrieve all records from the database
 
-    function createRecord(record, callback){
-        console.log("record to create: ",JSON.stringify(record));
-        $.ajax({
-            "url": relative_url,
-            "method":"POST",
-            "data":JSON.stringify(record),
-            "dataType":"JSON",
-            contentType:"application/json; charset=utf-8",
-            "success":function(result){
-                console.log("Created: ", result);
-                callback(result);
-            },
-            "error":function(xhr,status,error){
-                console.log("error: "+status+" msg:"+error);
-            }
-        });
-    }
-
-    function updateRecord(record, callback){
-        console.log("record to update: ",JSON.stringify(record));
-        $.ajax({
-            "url": relative_url+"/"+encodeURI(record.id),
-            "method":"PUT",
-            "data":JSON.stringify(record),
-            "dataType":"JSON",
-            contentType:"application/json; charset=utf-8",
-            "success":function(result){
-                console.log("Updated: ", result);
-                callback(result);
-            },
-            "error":function(xhr,status,error){
-                console.log("error: "+status+" msg:"+error);
-            }
-        });
-    }
-
-
-    function deleteRecord(id, callback){
-        $.ajax({
-            "url": relative_url+"/"+id,
-            "method":"DELETE",
-            "data":"",
-            "dataType":"JSON",
-            contentType:"application/json; charset=utf-8",
-            "success":function(result){
-                console.log(result);
-                callback(result);
-            },
-            "error":function(xhr,status,error){
-                console.log("error: "+status+" msg:"+error);
-            }
-        });
-    }
-
-    // Get All
-    function processGetAll(result){
-        console.log("in processGetAll");
-        for (record of result){
-            console.log(record);
-            // add it to the local table
-            addRecordToTable(record);
+function getAll(callback) {
+    $.ajax({
+        "url": relative_url,
+        "method":"GET",
+        "data":"",
+        "dataType": "JSON",
+        "success":function(result){
+            console.log("result is :", result);
+            callback(result);
+        },
+        "error":function(xhr,status,error){
+            console.log("error: "+status+" msg:"+error);
         }
-    }            
+    });
+}
 
-    // Get One
-    function processGetOne(result){
-        console.log("in processGetOne");
-        console.log(result);
-        // add it to the local table
-        addRecordToTable(result);
+//------------------------------------------------------------------------
+// Retrieve one record from the database
+
+function getOne(id, callback) {
+    $.ajax({
+        "url": relative_url+"/"+id,
+        "method":"GET",
+        "data":"",
+        "dataType": "JSON",
+        "success":function(result){
+            console.log("result is :", result);
+            callback(result);
+        },
+        "error":function(xhr,status,error){
+            console.log("error: "+status+" msg:"+error);
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+// Create a record in the database
+
+function createRecord(record, callback){
+    console.log("record to create: ",JSON.stringify(record));
+    $.ajax({
+        "url": relative_url,
+        "method":"POST",
+        "data":JSON.stringify(record),
+        "dataType":"JSON",
+        contentType:"application/json; charset=utf-8",
+        "success":function(result){
+            console.log("Created: ", result);
+            callback(result);
+        },
+        "error":function(xhr,status,error){
+            console.log("error: "+status+" msg:"+error);
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+// Update a record in the database
+
+function updateRecord(record, callback){
+    console.log("record to update: ",JSON.stringify(record));
+    $.ajax({
+        "url": relative_url+"/"+encodeURI(record.id),
+        "method":"PUT",
+        "data":JSON.stringify(record),
+        "dataType":"JSON",
+        contentType:"application/json; charset=utf-8",
+        "success":function(result){
+            console.log("Updated: ", result);
+            callback(result);
+        },
+        "error":function(xhr,status,error){
+            console.log("error: "+status+" msg:"+error);
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+// Delete a record from the database
+
+function deleteRecord(id, callback){
+    $.ajax({
+        "url": relative_url+"/"+id,
+        "method":"DELETE",
+        "data":"",
+        "dataType":"JSON",
+        contentType:"application/json; charset=utf-8",
+        "success":function(result){
+            console.log(result);
+            callback(result);
+        },
+        "error":function(xhr,status,error){
+            console.log("error: "+status+" msg:"+error);
+        }
+    });
+}
+
+//------------------------------------------------------------------------
+// Callback functions
+//------------------------------------------------------------------------
+
+// Get All
+function processGetAll(result){
+    console.log("in processGetAll");
+    for (record of result){
+        console.log(record);
+        // add it to the browser table
+        addRecordToTable(record);
     }
+}            
 
-    // Create
-    function processCreateResponse(result){
-        console.log("in process create");
-        console.log(result);
-        addRecordToTable(result)
-    }
+// Get One
+function processGetOne(result){
+    console.log("in processGetOne");
+    console.log(result);
+    // add it to the browser table
+    addRecordToTable(result);
+}
 
-    // Update
-    function processUpdateResponse(result){
-        console.log("in process update");
-        console.log(result);
-    }
+// Create
+function processCreateResponse(result){
+    console.log("in process create");
+    console.log(result);
+    addRecordToTable(result)
+}
 
-    // Delete
-    function processDeleteResponse(result){
-        console.log("in process delete");
-        console.log(result);
-    }
+// Update
+function processUpdateResponse(result){
+    console.log("in process update");
+    console.log(result);
+}
 
-    // Moved to script tag in html page
-    //getAll(processGetAllResponse)
-
-    // TEST CODE
-
-    //getAll(processGetAll);
-
-    //var getid = 2;
-    //getOne(getid, processGetOne);
-
-    //record = {"title":"Empires and Dance","artist":"Simple Minds","year":1980,"genre":"Punk"};
-    //createRecord(record, processCreateResponse);
-
-    //var updateid = 154;
-    //record2 = {"title":"Empires and Dance","artist":"Simple Minds","year":1980,"genre":"Post Punk"};
-    //updateRecord(record2, updateid, processUpdateResponse);
-    //record3 = {"id":154, "artist":"Jim Kerr"}
-    //updateRecord(record3, processUpdateResponse);
-
-    //var deleteid = 179;
-    //deleteRecord(deleteid, processDeleteResponse);
+// Delete
+function processDeleteResponse(result){
+    console.log("in process delete");
+    console.log(result);
+}

@@ -1,6 +1,6 @@
-# recordDAOframework.py
+# recordDAO.py
 #
-# This file implements the Data Access Object used by record_rest_srv.py
+# This file implements the Data Access Object used by recordserver.py
 # for all operations. It implements the following:
 # 1) Get all records
 # 2) Get one record by ID
@@ -9,7 +9,6 @@
 # 5) Delete a record
 # 
 # David O'Connell
-#
 #------------------------------------------------------------------------
 
 import mysql.connector as mc
@@ -57,6 +56,7 @@ class RecordDAO:
             self.database = cfg.hosted_db['database']         
 
 #------------------------------------------------------------------------
+# Function to create a database connection and return a cursor
 
     def get_cursor(self): 
         self.connection = mc.connect(
@@ -69,18 +69,19 @@ class RecordDAO:
         return self.cursor
 
 #------------------------------------------------------------------------
-# Check if the database from the configuration file exists
+# Function to check if the database from the configuration file exists
 
     def db_check(self):
         exists = False
         try:
             print("Looking for", self.database)
-            # this will not return a cursor if the database doesn't exist and an exception will be thrown
+            # This won't return a cursor if the database doesn't exist, exception will be thrown
             cursor = self.get_cursor()
             if cursor:
                 exists = True
         except Error as e:
             if e.errno == 1049:
+                # This is the error we get if the specificed database can't be found
                 print("Error: Database does not exist, creating database",self.database)
                 cnx = mc.connect(host=self.host,user=self.user,password=self.password)
                 cursor1 = cnx.cursor()
@@ -88,10 +89,12 @@ class RecordDAO:
                 cursor1.execute(sql)
 
             elif e.errno == -1:
+                # This is the error we get if the credentials are incorrect
                 print("Error: Check credentials in the database config file")
                 print("Exiting...")
                 sys.exit(0)
             else:
+                # Print the error number and stop the program as we won't be able to proceed
                 print("Error:",e, "Number:",e.errno)
                 print("Exiting...")
                 sys.exit(0)
@@ -131,8 +134,8 @@ class RecordDAO:
         self.connection.close()
         self.cursor.close()
 #------------------------------------------------------------------------
+# Get all records from the database, returns a list of dicts
 
-    # Get all records         
     def get_all_records(self):
   
         cursor = self.get_cursor()
@@ -140,18 +143,17 @@ class RecordDAO:
         cursor.execute(sql_string)
 
         # results will be a list of database records, each is a list of
-        # the fields - so it is a list of lists
+        # the fields, converted to dict
         results = cursor.fetchall()
         record_array = []
         for result in results:
-            #print(result)
             record_array.append(self.convert_to_dict(result))
         self.close_all()
 
         return record_array
 
 #------------------------------------------------------------------------
-# Find a record by ID
+# Find and return a record by ID.
 
     def find_record_by_id(self, id):
 
@@ -161,13 +163,15 @@ class RecordDAO:
         values = (id,)
         cursor.execute(sql_string, values)
         result = cursor.fetchone()
+
+        # Convert to dict
         returnvalue = self.convert_to_dict(result)
         self.close_all()
 
         return returnvalue
         
 #------------------------------------------------------------------------
-# Create a record
+# Create a record in the database
 
     def create_record(self, record):
 
@@ -194,7 +198,7 @@ class RecordDAO:
         self.connection.commit()
         self.close_all()
 
-        return(record)
+        return record
 
 #------------------------------------------------------------------------
 # Delete a record with an ID of 'id'  
@@ -212,6 +216,7 @@ class RecordDAO:
         return True
 
 #------------------------------------------------------------------------
+# Function to convert a list of attributes into a dict for easier handling
 
     def convert_to_dict(self, result_line):
 
@@ -225,7 +230,7 @@ class RecordDAO:
         return record
 
 #------------------------------------------------------------------------
-# Create an instance of the class 
+# Create an instance of the Record DAO() class 
 
 recordDAO = RecordDAO()
 TABLE_NAME = 'records'
@@ -246,7 +251,7 @@ if not results:
     recordDAO.create_record(record)
     recordDAO.create_record(record2)
 
-# Define a set of tests to execute if this module is run as main 
+# Define a set of tests to execute if this module is run as main
 if __name__ == "__main__":
     record = {"title":"London Calling","artist":"The Clash","year":1979,"genre":"Punk Rock"}
     record2 = {"title":"Foxtrot","artist":"Genesis","year":1973,"genre":"Prog Rock"} 
@@ -254,10 +259,13 @@ if __name__ == "__main__":
     print ("test get_all_records()")
     print (f"\t{recordDAO.get_all_records()}")
     print ("test find_record_by_id()")
-    print (f"\t{recordDAO.find_record_by_id(2)}")
+    find_id = input("Enter an ID to find: ")
+    print (f"\t{recordDAO.find_record_by_id(find_id)}")
     print ("test create_record()")
     print (f"\t{recordDAO.create_record(record)}")
     print ("test update_record()")
-    print (f"\t{recordDAO.update_record(1,record2)}")
+    upd_id = input("Enter an ID to update (update is fixed): ")
+    print (f"\t{recordDAO.update_record(upd_id,record2)}")
     print ("test delete_record()")
-    print (f"\t{recordDAO.delete_record(1)}")
+    del_id = input("Enter an ID to delete: ")
+    print (f"\t{recordDAO.delete_record(del_id)}")

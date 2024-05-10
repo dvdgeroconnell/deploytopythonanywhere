@@ -1,9 +1,11 @@
 # record_server.py
 #
 # Main python file and REST server for WSAA Final Project.
-# See README for instrunctions on use and curl commands to test.
+# Serves up recordviewer.html from staticpages.
+# See README for instructions on use and curl commands to test.
 #
 # David O'Connell
+#------------------------------------------------------------------------
 
 from flask import Flask, jsonify, url_for, request, redirect, abort, make_response
 from flask_cors import CORS, cross_origin
@@ -18,7 +20,7 @@ app = Flask(__name__, static_url_path='', static_folder='staticpages')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# This is global, as declarred outside of any function
+# This variable can be seen by all functions
 local_env = False
 
 #------------------------------------------------------------------------
@@ -68,7 +70,6 @@ def find_by_id(id):
         print("find_by_id OPTIONS")
         return _build_cors_preflight_response()
     # Get the response object
-    #return jsonify(recordDAO.find_record_by_id(id))
     response = jsonify(recordDAO.find_record_by_id(id))
     #response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -110,7 +111,6 @@ def create():
 
     # Create the record, get the response object
     print("Creating", record)
-    #return jsonify(recordDAO.create_record(record))
     response = jsonify(recordDAO.create_record(record))
     #response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -143,7 +143,6 @@ def update(id):
 
     # Update the record, get the response object
     print("Updating record", id, "to", record)
-    #return jsonify(recordDAO.update_record(id, record))
     response = jsonify(recordDAO.update_record(id, record))
     #response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -160,8 +159,6 @@ def delete(id):
         return _build_cors_preflight_response()
     # Delete the record, get the response object
     if recordDAO.delete_record(id):
-        #return jsonify(recordDAO.delete_record(id))
-        #return jsonify({"done":True})
         response = jsonify({"done":True})
         #response.headers.add("Access-Control-Allow-Origin", "*")
         return response
